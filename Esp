@@ -1,0 +1,61 @@
+-- LocalScript to be executed in the Command Bar or placed in StarterPlayerScripts
+
+local Players = game:GetService("Players")
+
+-- Function to highlight a character
+local function highlightCharacter(character)
+    if not character:FindFirstChildOfClass("Highlight") then
+        local highlight = Instance.new("Highlight")
+        highlight.Parent = character
+    end
+end
+
+-- Function to add a TextLabel above a character's head
+local function addTextLabel(character, playerName)
+    if not character:FindFirstChild("Head") then return end
+
+    local head = character.Head
+    if head:FindFirstChild("NameLabel") then return end
+
+    local billboardGui = Instance.new("BillboardGui")
+    billboardGui.Name = "NameLabel"
+    billboardGui.Size = UDim2.new(3, 0, 3, 0)  -- 3x3 size
+    billboardGui.StudsOffset = Vector3.new(0, 3, 0)
+    billboardGui.AlwaysOnTop = true
+    billboardGui.Parent = head
+
+    local textLabel = Instance.new("TextLabel")
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.Text = playerName
+    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    textLabel.TextScaled = true
+    textLabel.Parent = billboardGui
+end
+
+-- Function to handle a player and their character
+local function handlePlayer(player)
+    if player.Character then
+        highlightCharacter(player.Character)
+        addTextLabel(player.Character, player.Name)
+    end
+
+    -- Connect to CharacterAdded to handle new characters
+    player.CharacterAdded:Connect(function(character)
+        highlightCharacter(character)
+        addTextLabel(character, player.Name)
+    end)
+end
+
+-- Function to highlight all players and add TextLabels
+local function updateAllPlayers()
+    for _, player in pairs(Players:GetPlayers()) do
+        handlePlayer(player)
+    end
+end
+
+-- Run the function to update all players and refresh every second
+while true do
+    updateAllPlayers()
+    wait(1)
+end
